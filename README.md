@@ -162,8 +162,8 @@ void _submit() {
   });
 
   LoginBloc.login(
-          email: _emailTextboxController.text,
-          password: _passwordTextboxController.text)
+      email: _emailTextboxController.text,
+      password: _passwordTextboxController.text)
       .then((value) async {
     if (value.code == 200) {
       await UserInfo().setToken(value.token ?? "");
@@ -189,8 +189,8 @@ void _submit() {
           context: context,
           barrierDismissible: false,
           builder: (BuildContext context) => const WarningDialog(
-                description: "Login gagal, silahkan coba lagi",
-              ));
+            description: "Login gagal(?), silahkan coba lagi",
+          ));
     }
   }, onError: (error) {
     print(error);
@@ -198,8 +198,8 @@ void _submit() {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => const WarningDialog(
-              description: "Login gagal, silahkan coba lagi",
-            ));
+          description: "Login gagal(!), silahkan coba lagi",
+        ));
   });
 
   setState(() {
@@ -226,18 +226,12 @@ Setelah login berhasil, pengguna akan diarahkan ke halaman utama yang menampilka
 Kode terkait:
 
 ```dart
-class ProdukPage extends StatefulWidget {
-  const ProdukPage({Key? key}) : super(key: key);
-  @override
-  _ProdukPageState createState() => _ProdukPageState();
-}
-
 class _ProdukPageState extends State<ProdukPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('List Produk'),
+        title: const Text('List Terjemahan'),
         actions: [
           Padding(
               padding: const EdgeInsets.only(right: 20.0),
@@ -256,11 +250,11 @@ class _ProdukPageState extends State<ProdukPage> {
           if (snapshot.hasError) print(snapshot.error);
           return snapshot.hasData
               ? ListProduk(
-                  list: snapshot.data,
-                )
+            list: snapshot.data,
+          )
               : const Center(
-                  child: CircularProgressIndicator(),
-                );
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
@@ -355,19 +349,19 @@ Kode terkait:
 ```dart
 Widget _kodeProdukTextField() {
   return TextFormField(
-    decoration: const InputDecoration(labelText: "Kode Produk"),
+    decoration: const InputDecoration(labelText: "Bahasa Asli"),
     keyboardType: TextInputType.text,
-    controller: _kodeProdukTextboxController,
+    controller: _originalLanguageTextboxController,
     validator: (value) {
       if (value!.isEmpty) {
-        return "Kode Produk harus diisi";
+        return "Bahasa Asli harus diisi";
       }
       return null;
     },
   );
 }
 
-// ... (kode untuk nama produk dan harga produk)
+// ... (kode untuk bahasa terjemahan dan nama penerjemah)
 ```
 
 ### c. Proses Penyimpanan Produk Baru
@@ -491,17 +485,17 @@ ubah() {
 
 ![Screenshot popup berhasil ubah produk](assets/docs/sukses_ubah.png)
 
-Pengguna akan melihat popup yang menginformasikan hasil perubahan produk.
+Pengguna akan melihat popup yang menginformasikan hasil perubahan terjemahan.
 
-## Menghapus Produk
+## Menghapus Terjemahan
 
 ### a. Memilih Produk untuk Dihapus
 
-Dari halaman detail produk, pengguna dapat menekan tombol "DELETE" untuk menghapus produk.
+Dari halaman detail produk, pengguna dapat menekan tombol "DELETE" untuk menghapus terjemahan.
 
 ### b. Konfirmasi Penghapusan
 
-![Screenshot dialog konfirmasi hapus](docs/dialog_hapus.png)
+![Screenshot dialog konfirmasi hapus](assets/docs/dialog_hapus.png)
 
 Sebelum menghapus, aplikasi akan menampilkan dialog konfirmasi.
 
@@ -509,17 +503,35 @@ Kode terkait:
 
 ```dart
 void confirmHapus() {
+  if (widget.produk?.id == null) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => const WarningDialog(
+        description: "ID produk tidak ditemukan, tidak bisa menghapus.",
+      ),
+    );
+    return;
+  }
+
   AlertDialog alertDialog = AlertDialog(
     content: const Text("Yakin ingin menghapus data ini?"),
     actions: [
       OutlinedButton(
-        child: const Text("Ya"),
-        onPressed: () async {
-          // Proses penghapusan
-        },
+        child: const Text(
+          "Ya",
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
+        onPressed: {//Logic tombol},
       ),
       OutlinedButton(
-        child: const Text("Batal"),
+        child: const Text(
+          "Batal",
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
         onPressed: () => Navigator.pop(context),
       ),
     ],
@@ -565,39 +577,39 @@ onPressed: () async {
 },
 ```
 
-### d. Hasil Penghapusan Produk
+### d. Hasil Penghapusan Terjemahan
 
-![Screenshot popup berhasil hapus produk](docs/sukses_hapus.png)
+![Screenshot popup berhasil hapus produk](assets/docs/sukses_hapus.png)
 
-Pengguna akan melihat popup yang menginformasikan hasil penghapusan produk.
+Pengguna akan melihat popup yang menginformasikan hasil penghapusan terjemahan.
 
 ## Proses Logout
 
 ### a. Memilih Menu Logout
 
-![Screenshot drawer dengan menu logout](docs/logout.png)
+![Screenshot drawer dengan menu logout](assets/docs/logout.png)
 
 Pengguna dapat mengakses menu logout dari drawer aplikasi.
 
 Kode terkait:
 
 ```dart
-Drawer(
-  child: ListView(
-    children: [
-      ListTile(
-        title: const Text('Logout'),
-        trailing: const Icon(Icons.logout),
-        onTap: () async {
-          await LogoutBloc.logout().then((value) => {
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                    (route) => false)
-              });
-        },
-      )
-    ],
-  ),
+drawer: Drawer(
+    child: ListView(
+        children: [
+            ListTile(
+                title: const Text('Logout'),
+                trailing: const Icon(Icons.logout),
+                onTap: () async {
+                    await LogoutBloc.logout().then((value) => {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (context) => LoginPage()),
+                            (route) => false)
+                    });
+                },
+            )
+        ],
+    ),
 ),
 ```
 
